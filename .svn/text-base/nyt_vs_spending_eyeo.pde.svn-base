@@ -1,0 +1,131 @@
+/**
+NYT vs Contract Spending - Barred
+This piece compares Federal contract spending in various departments with the media attention
+for similarly related keywords in the New York Times.
+Once the data is loaded, we do some calculating to determine the positions of the left and
+right sides of our curves.
+
+Sidenote, this was written when Processing was still using Java 1.4. As such you'll notice
+a lack of generics (used with ArrayList as in ArrayList<LineData>) as well as a few other 
+outdated techniques.
+*/
+
+  
+ArrayList lineData = new ArrayList();; //array of LineData objects. These contain the positions of the (left & right) boxes for a given dept
+float opacity = 0.9; //opacity for our sketch, 90%
+int labelMarginSize = 0; //left and right margins (no margin)
+
+/* Colors! curColor is determined by interpolating between c1 & c2 */
+color curColor;
+color c1 = color(0, 102, 153);
+color c2 = color(204, 102, 0);
+
+boolean readyToDraw = false; //set to true once the data has finished loading
+
+//these represent the amount of contract spending for various government agencies
+float[] leftData = {365872119808f,31151591424f,18752557056f,14867478528f,14401858560f,14095173632f,13622506496f,6862856704f,6794577920f,5170748416f,5082910720f,5061363712f,4599583232f,4177641216f,3108542208f,2246002176f,
+  1752789504f,1467226112f,1426349824f,1035787520f,739483392f,86914512f};
+//these represent the number of articles in the NYT about various topics
+float[] rightData = {9533,5028,4999,4544,3960,3179,2888,2624,2217,1987,1898,1797,1347,921,696,530,480,364,290,77,0};
+//these are the links from the leftData to the rightData
+int[] connections = {2,1,0,18,8,15,20,16,4,12,11,13,14,7,10,19,6,21,3,9,5};
+
+
+
+void setup() {
+  size(1200,1000);
+  smooth();
+  
+  readyToDraw = true;
+  
+}
+void draw() {
+  if(!readyToDraw) {
+    return;
+  }
+  //HSB mode to do color blending of Hue
+  colorMode(HSB);
+  background(255);
+  
+  /* determine contract spending (left side) positions */
+
+
+  //grab the total amount of spending across all departments
+  float totalSpending = 0;
+  for(int i = 0; i < leftData.length; i++) {
+    totalSpending += leftData[i];
+  }
+  float totalFrac = 0; //running total of the fractional total of spending
+  float barWidth = 200; //how big each bar should be
+  float yPos = 0;
+  float xPos = labelMarginSize;
+  for(int i = 0; i < leftData.length; i++) {
+    float spent = leftData[i];
+    //determine color by interpolating between c1,c2
+    color c = lerpColor(c1,c2,(float)i/(float)leftData.length);
+    //update fraction
+    totalFrac += spent / totalSpending;
+    //determine bar height
+    float barHeight = map(spent, 0, totalSpending, 0, height);
+    //setup lineData to contain the left side information
+    LineData ld = new LineData();
+    ld.leftXPos = labelMarginSize + barWidth;
+    ld.leftYPosStart = yPos;
+    ld.leftYPosEnd = yPos + barHeight;
+    ld.col = c;
+    //add LineData to array, draw later
+    lineData.add(ld);
+ 
+    //update yPos for next SpendingData obj
+    yPos += barHeight;
+  
+  }
+  
+  
+  /* The left side (Contract spending) is now setup.
+  Next we setup the right side position. These corrsepond to the NYT data */
+  
+  //totalSpending now represents total number of articles
+  float totalArticles = 0;
+  totalFrac = 0;
+  yPos = 0;
+  xPos = width-barWidth-labelMarginSize;
+  for(int i = 0 ; i < rightData.length; i++) {
+    totalArticles += rightData[i];
+  }
+
+  for(int i = 0; i < rightData.length; i++) {
+    float numArticles = rightData[i];
+    //same idea as before, keep a running fractional total
+    totalFrac += numArticles / totalArticles;
+    //determine bar Height by mapping from totalArticles to height    
+    float barHeight = map(numArticles, 0, totalArticles, 0, height);
+
+    LineData ld = (LineData)lineData.get(connections[i]);
+    //setup the right side bar positions
+    ld.rightXPos = width-labelMarginSize-barWidth;
+    ld.rightYPosStart = yPos;
+    ld.rightYPosEnd = yPos+barHeight;
+    
+    yPos += barHeight;
+
+  }
+  /**
+  Now that all the LineData is setup properly,
+  We can draw everything!
+  */
+  //for each of our LineData objects
+  for(int i = 0; i < lineData.size(); i++) {
+    noFill();
+    LineData ld = (LineData) lineData.get(i);
+    //set colors
+    stroke(ld.col,255*opacity);
+    fill(ld.col, 255* opacity);
+    //call draw on LineData object
+    ld.draw(barWidth);
+  }
+
+  //save it out! 
+  saveFrame("output.png");
+};
+

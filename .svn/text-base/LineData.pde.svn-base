@@ -1,0 +1,49 @@
+/*
+LineData class contains position information. The left side has the department contract spending positions.
+The right side has the NYT keyword frequency positions.
+*/
+
+public class LineData {
+  float leftXPos;
+  float leftYPosStart;
+  float leftYPosEnd;
+  
+  float rightXPos;
+  float rightYPosStart;
+  float rightYPosEnd;
+  
+  color col;
+  String toString() {
+    return  leftXPos + " " + leftYPosStart+ " " + leftYPosEnd + " " + rightXPos + " " + rightYPosStart + " " + rightYPosEnd;
+  }
+
+  /*
+  Draws a bezier curve shape between the left side and the right side.
+  Additionally fills in rects on each side as start and end points
+  */  
+  void draw(float barWidth) {
+     //.3333 & .6666 used to calculate bezier control vertexes
+
+    float lowValue = 1.0/3.0;
+    float highValue = 2.0/3.0;
+    
+    if(rightXPos == 0) { //if we have a line Data object that doesn't correspond to a keyword (All other agenies)
+      return; //just skip it
+    }
+    //begin a filled shape
+    beginShape();
+    //vertexes for the left side rect
+    vertex(leftXPos-barWidth,leftYPosEnd);
+    vertex(leftXPos-barWidth, leftYPosStart);
+    vertex(leftXPos,leftYPosStart);
+    //top edge of the bezier
+    bezierVertex(leftXPos * highValue + rightXPos * lowValue, leftYPosStart, leftXPos * lowValue + rightXPos * highValue, rightYPosStart, rightXPos, rightYPosStart);
+    //vertices for the right side rect
+    vertex(rightXPos + barWidth, rightYPosStart);
+    vertex(rightXPos + barWidth, rightYPosEnd);
+    vertex(rightXPos, rightYPosEnd);
+    //bottom edge of the bezier
+    bezierVertex(rightXPos * highValue + leftXPos * lowValue, rightYPosEnd, rightXPos * lowValue + leftXPos * highValue, leftYPosEnd, leftXPos, leftYPosEnd);
+    endShape(CLOSE);
+  }
+}
