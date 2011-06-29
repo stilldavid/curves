@@ -4,9 +4,9 @@ LineData class contains position information.
 
 public class LineData {
 
-  float[] XPos = new float[12];
-  float[] YPosStart = new float[12];
-  float[] YPosEnd = new float[12];
+  float[] XPos = new float[data[1].length];
+  float[] YPosStart = new float[data[1].length];
+  float[] YPosEnd = new float[data[1].length];
 
   color col;
 
