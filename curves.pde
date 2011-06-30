@@ -102,7 +102,7 @@ float data[][] = {
 };
 
 void setup() {
-  size(3200,1200);
+  size(1600,980);
   smooth();
   colorMode(HSB);
 }
@@ -113,18 +113,25 @@ void draw() {
   //grab the max # sold ever
   float max = 0;
   float[] runningTot = new float[data[1].length];
+  float[] columnTot = new float[data[1].length];
 
   for(int i = 0; i < runningTot.length; i++)
     runningTot[i] = 0; // init all the totals
 
-  // set max column val
+  // set max column val and set column totals
   for(int i = 0; i < data[0].length; i++) {
     int tot = 0;
-    for(int j = 0; j < data.length; j++)
+    for(int j = 0; j < data.length; j++) {
       tot += data[j][i];
+      columnTot[i] += data[j][i];
+    }
     if ( tot > max )
       max = tot;
   }
+
+  // scale totals accordingly
+  for(int i = 0; i < columnTot.length; i++)
+    columnTot[i] = map(columnTot[i], 0, max, 0, height);
 
   float barWidth = width / (data[1].length - 1); // how big each bar should be
 
@@ -134,7 +141,7 @@ void draw() {
     float xPos = 0;
     // loop for each number
     LineData ld = new LineData();
-    //print ("\n");
+
     for(int j = 0; j < data[i].length; j++) {
       float spent = data[i][j];
 
@@ -146,6 +153,10 @@ void draw() {
 
       // update yPos for next SpendingData obj
       yPos = runningTot[j];
+
+      print(yPos / columnTot[j] + " ");
+      yPos = map(yPos/columnTot[j], 0, 1, (height/2) - (columnTot[j]/2), (height/2) + (columnTot[j]/2));
+
       ld.XPos[j] = j * barWidth;
       ld.YPosStart[j] = yPos; // top
       ld.YPosEnd[j] = yPos + barHeight; // bottom
@@ -155,6 +166,7 @@ void draw() {
       //print(j + ": " + runningTot[j] + "\n");
       runningTot[j] += barHeight;
     }
+    print("\n");
     //add LineData to array, draw later
     lineData.add(ld);
   }
