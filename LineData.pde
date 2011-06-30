@@ -32,8 +32,8 @@ public class LineData {
     beginShape();
 
     // vertexes for the left side rect
-    vertex(XPos[0], YPosEnd[0]); // bottom left
-    vertex(XPos[0], YPosStart[0]); // top left
+    vertex(XPos[0], height-YPosEnd[0]); // bottom left
+    vertex(XPos[0], height-YPosStart[0]); // top left
 
     //print("\n\n");
 
@@ -48,7 +48,7 @@ public class LineData {
       //fill(this.col, 255* opacity);
       //ellipse(XPos[i+1], YPosStart[i+1], 3, 3);
       //text(i, XPos[i+1], YPosStart[i+1] - 5);
-      bezierVertex(XPos[i] * highValue + XPos[i+1] * lowValue, YPosStart[i], XPos[i] * lowValue + XPos[i+1] * highValue, YPosStart[i+1], XPos[i+1], YPosStart[i+1]);
+      bezierVertex(XPos[i] * highValue + XPos[i+1] * lowValue, height-YPosStart[i], XPos[i] * lowValue + XPos[i+1] * highValue, height-YPosStart[i+1], XPos[i+1], height-YPosStart[i+1]);
 
       // parameters
       // bezierVertex(cpx1, cpy1, cpx2, cpy2, x, y);
@@ -56,14 +56,14 @@ public class LineData {
     }
 
     // vertices for the right side rect
-    vertex(XPos[s], YPosStart[s]); // top right
-    vertex(XPos[s], YPosEnd[s]); // bottom right
+    vertex(XPos[s], height-YPosStart[s]); // top right
+    vertex(XPos[s], height-YPosEnd[s]); // bottom right
 
     for(int i = XPos.length - 1; i > 0; i--) {
       if(i <= 0)
         break;
       //bottom edge of the bezier from right to left
-      bezierVertex(XPos[i] * highValue + XPos[i-1] * lowValue, YPosEnd[i], XPos[i] * lowValue + XPos[i-1] * highValue, YPosEnd[i-1], XPos[i-1], YPosEnd[i-1]);
+      bezierVertex(XPos[i] * highValue + XPos[i-1] * lowValue, height-YPosEnd[i], XPos[i] * lowValue + XPos[i-1] * highValue, height-YPosEnd[i-1], XPos[i-1], height-YPosEnd[i-1]);
     }
 
     endShape(CLOSE);
