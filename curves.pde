@@ -117,16 +117,14 @@ void draw() {
   for(int i = 0; i < runningTot.length; i++)
     runningTot[i] = 0; // init all the totals
 
-  // set all the max vals
-  for(int i = 0; i < data.length; i++) {
+  // set max column val
+  for(int i = 0; i < data[0].length; i++) {
     int tot = 0;
-    for(int j = 0; j < data[1].length; j++) {
-      tot += data[i][j];
-    }
+    for(int j = 0; j < data.length; j++)
+      tot += data[j][i];
     if ( tot > max )
       max = tot;
   }
-  print(max);
 
   float barWidth = width / (data[1].length - 1); // how big each bar should be
 
@@ -178,5 +176,6 @@ void draw() {
 
   //save it out! 
   saveFrame("output.png");
+  noLoop();
 };
 
