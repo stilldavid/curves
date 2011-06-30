@@ -1,7 +1,3 @@
-/*
-LineData class contains position information.
-*/
-
 public class LineData {
 
   float[] XPos = new float[data[1].length];
