@@ -6,24 +6,36 @@
  * Inspired by and partly stolen from Wes Grubbs (@pitchinteractiv)
 */
 
+// we want a pretty pdf
+import processing.pdf.*;
+
 ArrayList lineData = new ArrayList();; //array of LineData objects. These contain the positions of the (left & right) boxes for a given dept
-float opacity = 0.7; //opacity for our sketch, 90%
+float opacity = 0.5; //opacity for our sketch, 90%
 
 /* Colors! curColor is determined by interpolating between c1 & c2 */
 color curColor;
+//color c1 = color(197, 69, 34);
+//color c2 = color(150, 49, 19);
+
 color c1 = color(0, 102, 153);
 color c2 = color(204, 102, 0);
+
+//color c1 = #4063bc;
+//color c2 = #4a2a15;
+
+
 
 String[] lines;
 int recordCount;
 float[][] data;
 
 void setup() {
-  size(3200,980);
+  size(6000,2750);
+  //size(1600, 1000);
   smooth();
   colorMode(HSB);
 
-  lines = loadStrings("data.csv");
+  lines = loadStrings("out_0701.csv");
   String[] counter = split(lines[1], ","); // Load data into array
   data = new float[lines.length][counter.length];
 
@@ -34,6 +46,8 @@ void setup() {
       recordCount++;
     }
   }
+
+  beginRecord(PDF, "test.pdf");
 
 }
 void draw() {
@@ -52,8 +66,13 @@ void draw() {
   for(int i = 0; i < data[0].length; i++) {
     int tot = 0;
     for(int j = 0; j < data.length; j++) {
-      tot += data[j][i];
-      columnTot[i] += data[j][i];
+      if(i >= 2) { // don't add up the IDs and Categories
+        tot += data[j][i];
+        columnTot[i] += data[j][i];
+      } else {
+        tot += 0;
+        columnTot[i] += 0;
+      }
     }
     if ( tot > max )
       max = tot;
@@ -63,7 +82,7 @@ void draw() {
   for(int i = 0; i < columnTot.length; i++)
     columnTot[i] = map(columnTot[i], 0, max, 0, height);
 
-  float barWidth = width / (data[1].length - 1); // how big each bar should be
+  float barWidth = width / (data[1].length - 3); // how big each bar should be
 
   // Loop for each product
   for(int i = 0; i < data.length; i++) {
@@ -72,11 +91,11 @@ void draw() {
     // loop for each number
     LineData ld = new LineData();
 
-    for(int j = 0; j < data[i].length; j++) {
+    for(int j = 2; j < data[i].length; j++) {
       float spent = data[i][j];
 
       // determine color by interpolating between c1,c2
-      color c = lerpColor(c1,c2,(float)i/(float)data[i].length);
+      color c = lerpColor(c1,c2,(float)data[i][1]/(float)data[i].length -2);
 
       // determine bar height
       float barHeight = map(spent, 0, max, 0, height);
@@ -86,7 +105,7 @@ void draw() {
 
       yPos = map(yPos/columnTot[j], 0, 1, (height/2) - (columnTot[j]/2), (height/2) + (columnTot[j]/2));
 
-      ld.XPos[j] = j * barWidth;
+      ld.XPos[j] = (j - 2) * barWidth;
       ld.YPosStart[j] = yPos; // top
       ld.YPosEnd[j] = yPos + barHeight; // bottom
       ld.col = c;
@@ -106,7 +125,7 @@ void draw() {
     noFill();
     LineData ld = (LineData) lineData.get(i);
     //set colors
-    stroke(ld.col,255*opacity);
+    stroke(ld.col, 255*opacity);
     fill(ld.col, 255* opacity);
     //call draw on LineData object
     ld.draw(barWidth);
@@ -115,6 +134,8 @@ void draw() {
 
   //save it out! 
   saveFrame("output.png");
-  noLoop();
+  endRecord();
+  //noLoop();
+  exit();
 };
 

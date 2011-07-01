@@ -33,7 +33,7 @@ public class LineData {
 
     //print("\n\n");
 
-    for(int i = 0; i < XPos.length; i++) {
+    for(int i = 2; i < XPos.length; i++) {
       if(i >= XPos.length - 1)
         break;
 
